@@ -1,0 +1,156 @@
+# JZ_Offer1
+
+package Search;
+//数字在排序数组中出现的次数
+//题目描述：统计一个数字在排序数组中出现的次数
+//本题共四种解法
+
+public class GetNumberOfK_38 {
+
+    //方法一：将数组遍历一遍（很low）——时间复杂度O(n)；空间复杂度O(1)。
+    /*
+    public int getNum(int[] nums,int K) {
+       if(nums==null||nums.length==0){
+           return 0;
+       }
+        int sum=0;
+        for(int i=0;i<nums.length;i++){
+            if(nums[i]==K){
+                sum++;
+            }
+        }
+        return sum;
+    }
+    */
+
+//————————————————————————————————————————————————————————————————————————
+    //方法二：二分查找——最坏时间复杂度O(logn)+O(n/2)+O(n/2)=O(n)；空间复杂度O(1)。
+    /*
+    数组是有序的，我们可以利用二分查找。直观地一个思路就是通过二分查找获得一个k
+    在数组中的下标，然后顺序的在k的前面和后面寻找和k相等的数。
+     */
+    /*
+public int getNum(int[] nums,int K) {
+    if(nums==null||nums.length==0){
+        return 0;
+    }
+    int i = 0;
+    int j = nums.length - 1;
+    int m=0;
+    int sum = 0;
+    while (i <= j) {
+        m = (i + j) / 2;
+        if (nums[m] == K) {
+            sum++;
+            break;
+        } else if (nums[m] > K) {
+            j = m - 1;
+        } else {
+            i = m + 1;
+        }
+    }
+    for(i=m-1;(i>=0)&&(nums[i]==K);i--){
+        sum++;
+    }
+    for(i=m+1;(i<=nums.length)&&(nums[i]==K);i++){
+        sum++;
+    }
+    return sum;
+}
+*/
+//但是面试官可能还不是很满意，还想要更快的方法。
+
+//————————————————————————————————————————————————————————————————————————
+
+    //方法三：利用二分查找找到第一次k出现的下标和最后一次出现k的下标
+    //        然后两个下标相减+1 ——>就是 数字k出现的次数
+    //         时间复杂度O(logn)；空间复杂度O(logn)。
+    /*
+    思路是通过二分找到一个k，先判断这个数字是不是第一个k，
+    如果中间数字的前面一个数字不是k，那么此时中间数字刚好就是第一个k；
+    如果中间数字的前面一个数字也是k，那么第一个k肯定在数组的前半段，
+    继续二分，这是递归的过程。
+     */
+    /*主方法：
+    public int getNum(int[] nums,int K) {
+        if(nums==null||nums.length==0){
+            return 0;
+        }
+        int firstK=FetFirstK(nums,K,0,nums.length-1);
+        int lastK=FetLastK(nums,K,0,nums.length-1);
+        if(firstK!=-1&&lastK!=-1){
+            return lastK-firstK+1;
+        }
+        return 0;
+    }
+//寻找第一个 K 下标的方法（递归实现）
+    private int FetFirstK(int[] elem, int k, int start, int end) {
+        if(start>end){
+            return -1;
+        }
+        int m=(start+end)/2;
+        if(elem[m]>k){
+            return FetFirstK(elem,k,start,m-1);
+        }else if(elem[m]<k){
+            return FetFirstK(elem,k,m+1,end);
+        }else if(m-1>=0&&elem[m-1]==k){
+            return FetFirstK(elem,k,start,m-1);
+        }else {
+            return m;
+        }
+    }
+
+//寻找最后一个 K 下标的方法（非递归实现）
+    private int FetLastK(int[] elem, int k, int start, int end) {
+        if(start>end){
+            return -1;
+        }
+        int m=(start+end)/2;
+        while (start<=end){
+            if(elem[m]>k){
+                end=m-1;
+            }else if(elem[m]<k){
+                start=m+1;
+            }else if(m+1<elem.length&&elem[m+1]==k){
+                start=m+1;
+            }else {
+                return m;
+            }
+            m=(start+end)/2;
+        }
+        return -1;
+    }
+    */
+
+ //————————————————————————————————————————————————————————————————————————
+
+    //方法四：也是利用二分查找算法——>时间复杂度O(logn)；空间复杂度O(1)。
+    /*
+    思路是：因为数组中都是整数，所以可以稍微变一下，不是搜索k的两个位置，
+    而是搜索k-0.5和k+0.5这两个数应该插入的位置，然后相减即可。
+     */
+    public int getNum(int[] nums,int K) {
+        if(nums==null||nums.length==0){
+            return 0;
+        }
+        return binSearch(nums,K+0.5)-binSearch(nums,K-0.5);
+    }
+    private int binSearch(int[] elem,double num){
+        int start=0;
+        int end=elem.length-1;
+        int m=(start+end)/2;
+        while (start<=end){
+            if(elem[m]<num){
+                start=m+1;
+            }else if(elem[m]>num){
+                end=m-1;
+            }
+            m=(start+end)/2;
+        }
+        return start;
+    }
+    public static void main(String[] args) {
+        int[] arr={1,2,3,3,3,4,6};
+        System.out.println(new GetNumberOfK_38().getNum(arr,3));
+    }
+}
